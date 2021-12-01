@@ -8,7 +8,7 @@ format:
 	poetry run black day1
 
 lint: format
-	poetry run flake8 day1/*
+	poetry run flake8 day1/*.py
 
 test:
 	poetry run pytest --cov=day1 --cov-report=xml
@@ -32,4 +32,7 @@ complexity-baseline:
 	poetry run xenon --max-absolute C --max-modules A --max-average A day1
 
 mypy:
-	poetry run mypy --pretty aws_lambda_powertools
+	poetry run mypy --pretty day1
+
+pr:
+	poetry run pre-commit run --all-files
