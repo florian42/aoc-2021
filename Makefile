@@ -5,16 +5,16 @@ dev:
 	poetry run pre-commit run --all-files
 
 format:
-	poetry run black day1
+	poetry run black day2
 
 lint: format
-	poetry run flake8 day1/*.py
+	poetry run flake8 day2/*.py
 
 test:
-	poetry run pytest --cov=day1 --cov-report=xml
+	poetry run pytest --cov=day2 --cov-report=xml
 
 coverage-html:
-	poetry run pytest --cov=day1 --cov-report=html
+	poetry run pytest --cov=day2 --cov-report=html
 
 pre-commit:
 	pre-commit run --show-diff-on-failure
@@ -29,10 +29,10 @@ release-docs:
 
 complexity-baseline:
 	$(info Cyclomatic complexity index)
-	poetry run xenon --max-absolute C --max-modules A --max-average A day1
+	poetry run xenon --max-absolute C --max-modules A --max-average A day2
 
 mypy:
-	poetry run mypy --pretty day1
+	poetry run mypy --pretty day2
 
 pr:
 	poetry run pre-commit run --all-files
