@@ -7,7 +7,6 @@ from typing import List, Tuple
 class BingoBoard:
     def __init__(self, rows: List[List[int]]):
         self.rows = [[Number(number) for number in rows] for rows in rows]
-        self.rows = [row for row in self.rows if len(row) > 1]
 
     def has_won(self) -> bool:
         for row in self.rows:
@@ -33,13 +32,10 @@ class BingoBoard:
         return False
 
     def __repr__(self):
-        return "|".join("".join([str(x.number) for x in row]) for row in self.rows)
+        return "".join("".join([str(x) for x in row]) for row in self.rows)
 
     def __str__(self):
         return "\n".join(", ".join([str(x) for x in row]) for row in self.rows)
-
-    def __hash__(self):
-        return hash(repr(self))
 
 
 class Number:
@@ -49,19 +45,6 @@ class Number:
 
     def __repr__(self):
         return f"[{self.number} {self.isMarked}], "
-
-    def __add__(self, other):
-        if isinstance(other, Number):
-            return Number(self.number + other.number)
-        return self.number + other
-
-    def __sub__(self, other):
-        if isinstance(other, Number):
-            return Number(self.number - other.number)
-        return self.number - other
-
-    def __hash__(self):
-        return hash(repr(self))
 
 
 def calc_score(board, number):
