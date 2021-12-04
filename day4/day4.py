@@ -13,9 +13,7 @@ class BingoBoard:
             if all(num.isMarked is True for num in row):
                 return True
         transposed_rows: List[List[Number]] = list(map(list, zip(*self.rows)))
-        for row in transposed_rows:
-            if all(num.isMarked is True for num in row):
-                return True
+        return any(all(num.isMarked is True for num in row) for row in transposed_rows)
 
     def mark(self, num_to_mark: int):
         for row in self.rows:

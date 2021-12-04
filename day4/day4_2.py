@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import List
+from copy import deepcopy
+from typing import List, Tuple
 
 
 class BingoBoard:
@@ -13,9 +14,7 @@ class BingoBoard:
             if all(num.isMarked is True for num in row):
                 return True
         transposed_rows: List[List[Number]] = list(map(list, zip(*self.rows)))
-        for row in transposed_rows:
-            if all(num.isMarked is True for num in row):
-                return True
+        return any(all(num.isMarked is True for num in row) for row in transposed_rows)
 
     def mark(self, num_to_mark: int):
         for row in self.rows:
@@ -24,10 +23,17 @@ class BingoBoard:
                     num.isMarked = True
 
     def __eq__(self, other: object):
-        return str(self) == str(other)
+        if isinstance(other, BingoBoard):
+            for row_index, row in enumerate(self.rows):
+                for column_index, num in enumerate(row):
+                    other_number = other.rows[row_index][column_index]
+                    if num.number != other_number.number:
+                        return False
+            return True
+        return False
 
     def __repr__(self):
-        return "".join("".join([str(x) for x in row]) for row in self.rows)
+        return "|".join("".join([str(x.number) for x in row]) for row in self.rows)
 
     def __str__(self):
         return "\n".join(", ".join([str(x) for x in row]) for row in self.rows)
@@ -67,21 +73,25 @@ def calc_score(board, number):
     return total * number
 
 
-def play(all_marked_numbers: List[int], boards: List[BingoBoard]):
-    number_of_boards = len(boards)
-    winner = None
-    looser = None
+def is_in_winning_list(winners: List[Tuple[BingoBoard, int]], other: BingoBoard):
+    if not winners:
+        return False
+    return any(board == other for board, _ in winners)
+
+
+def play(
+    all_marked_numbers: List[int], boards: List[BingoBoard]
+) -> tuple[tuple[BingoBoard, int], tuple[BingoBoard, int]]:
+    winners: List[Tuple[BingoBoard, int]] = []
     for number in all_marked_numbers:
         for board in boards:
             board.mark(number)
-            if board.has_won() and number_of_boards == len(boards):
-                winner = board, number
-            if board.has_won() and len(boards) == 1:
-                looser = board, number
             if board.has_won():
-                boards.remove(board)
+                in_list = is_in_winning_list(winners, board)
+                if not in_list:
+                    winners.append((deepcopy(board), number))
 
-    return winner, looser
+    return winners[0], winners[-1]
 
 
 if __name__ == "__main__":
