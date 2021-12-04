@@ -215,7 +215,7 @@ python-versions = "*"
 name = "more-itertools"
 version = "8.12.0"
 description = "More routines for operating on iterables, beyond itertools"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.5"
 
@@ -474,7 +474,7 @@ requests = ">=2.0,<3.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "9ccdb21fbe9b9f713e06ea9eb926688d11a57e87d12d2aa14536817a8aba9206"
+content-hash = "7c1b5c99cbdaa83cfca5d1b0a7bda836fadad01ca4daa029b82dd03223bb1363"
 
 [metadata.files]
 atomicwrites = [

@@ -19,9 +19,9 @@ class BingoBoard:
 
     def mark(self, num_to_mark: int):
         for row in self.rows:
-            for number in row:
-                if number.number == num_to_mark:
-                    number.isMarked = True
+            for num in row:
+                if num.number == num_to_mark:
+                    num.isMarked = True
 
     def __eq__(self, other: object):
         return str(self) == str(other)
@@ -32,6 +32,9 @@ class BingoBoard:
     def __str__(self):
         return "\n".join(", ".join([str(x) for x in row]) for row in self.rows)
 
+    def __hash__(self):
+        return hash(repr(self))
+
 
 class Number:
     def __init__(self, num: int):
@@ -39,7 +42,7 @@ class Number:
         self.isMarked = False
 
     def __repr__(self):
-        return f"{self.number}, {self.isMarked}"
+        return f"[{self.number} {self.isMarked}], "
 
     def __add__(self, other):
         if isinstance(other, Number):
@@ -51,6 +54,35 @@ class Number:
             return Number(self.number - other.number)
         return self.number - other
 
+    def __hash__(self):
+        return hash(repr(self))
+
+
+def calc_score(board, number):
+    total = 0
+    for row in board.rows:
+        for num in row:
+            if num.isMarked is False:
+                total += num.number
+    return total * number
+
+
+def play(all_marked_numbers: List[int], boards: List[BingoBoard]):
+    number_of_boards = len(boards)
+    winner = None
+    looser = None
+    for number in all_marked_numbers:
+        for board in boards:
+            board.mark(number)
+            if board.has_won() and number_of_boards == len(boards):
+                winner = board, number
+            if board.has_won() and len(boards) == 1:
+                looser = board, number
+            if board.has_won():
+                boards.remove(board)
+
+    return winner, looser
+
 
 if __name__ == "__main__":
     content = open("input.txt").read().split("\n\n")
@@ -60,17 +92,8 @@ if __name__ == "__main__":
         BingoBoard([list(map(int, line.split())) for line in board.split("\n")])
         for board in content[1:]
     ]
-    is_won = False
-    for number in all_marked_numbers:
-        if not is_won:
-            for board in boards:
-                board.mark(number)
-                has_won = board.has_won()
-                if has_won:
-                    is_won = True
-                    total = 0
-                    for row in board.rows:
-                        for num in row:
-                            if num.isMarked is False:
-                                total += num.number
-                    print(total * number)
+
+    winner, looser = play(all_marked_numbers, boards)
+
+    print(calc_score(winner[0], winner[1]))
+    print(calc_score(looser[0], looser[1]))
