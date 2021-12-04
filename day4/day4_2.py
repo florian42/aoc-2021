@@ -69,10 +69,8 @@ def play(
     for number in all_marked_numbers:
         for board in boards:
             board.mark(number)
-            if board.has_won():
-                in_list = is_in_winning_list(winners, board)
-                if not in_list:
-                    winners.append((deepcopy(board), number))
+            if board.has_won() and not is_in_winning_list(winners, board):
+                winners.append((deepcopy(board), number))
 
     return winners[0], winners[-1]
 
