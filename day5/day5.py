@@ -48,8 +48,10 @@ class CoordinateSystem:
 
     def __repr__(self):
         string = ""
-        for row in range(10):
-            for column in range(10):
+        x_length = max(point[0] for point in self.grid.keys())
+        y_length = max(point[1] for point in self.grid.keys())
+        for row in range(x_length):
+            for column in range(y_length):
                 string += self.grid[(column, row)]
             string += "\n"
         return string
@@ -66,3 +68,4 @@ if __name__ == "__main__":
             xy.mark(point)
     print("Part 2:")
     print(xy.count_at_least_two_points_overlap())
+    print(xy)
