@@ -1,7 +1,7 @@
 import pathlib
 import sys
 from functools import reduce
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 
 
 def parse(puzzle_input):
@@ -11,13 +11,14 @@ def parse(puzzle_input):
 
 def part1(data: List[List[int]]):
     """Solve part 1"""
-    low_points = find_local_minima(data)
+    low_points, _ = find_local_minima(data)
     return reduce(lambda x, y: x + 1 + y, low_points) + 1
 
 
 def find_local_minima(data):
     size = len(data), len(data[0])
     low_points = []
+    low_points_pos = []
     for index_row in range(size[0]):
         for index_column in range(size[1]):
             top = data[index_row - 1][index_column] if index_row > 0 else float("inf")
@@ -38,51 +39,33 @@ def find_local_minima(data):
             current = data[index_row][index_column]
             if current < min(neighbours):
                 low_points.append(current)
-    return low_points
+                low_points_pos.append((index_row, index_column))
+    return low_points, low_points_pos
 
 
-def find_horizontal_gradient(
-    point: Tuple[int, int], grid: Dict[Tuple[int, int], int], length: int
-):
-    current_point_value = grid[point]
-    right = [grid[(point[0], num)] for num in range(point[1] + 1, length)]
-    left = list(reversed([grid[(point[0], num)] for num in range(point[1])]))
-
-    right_basin = []
-    left_basin = []
-    for _ in right:
-        neighbour = right.pop(0)
-        if neighbour > current_point_value and neighbour != 9:
-            right_basin.append(neighbour)
-
-    for _ in left:
-        neighbour = left.pop(0)
-        if neighbour > current_point_value and neighbour != 9:
-            left_basin.append(neighbour)
-
-    return [*right_basin, *left_basin]
+def find_nbrs(point, length, width):
+    nbrs = []
+    if point[0] > 0:
+        nbrs.append((point[0] - 1, point[1]))
+    if point[0] < length - 1:
+        nbrs.append((point[0] + 1, point[1]))
+    if point[1] > 0:
+        nbrs.append((point[0], point[1] - 1))
+    if point[1] < width - 1:
+        nbrs.append((point[0], point[1] + 1))
+    return nbrs
 
 
-def find_vertical_gradient(
-    point: Tuple[int, int], grid: Dict[Tuple[int, int], int], height: int
-):
-    current_point_value = grid[point]
-    down = [grid[(num, point[0])] for num in range(point[0] + 1, height)]
-    top = list(reversed([grid[(num, point[0])] for num in range(point[0])]))
-
-    down_basin = []
-    top_basin = []
-    for _ in down:
-        neighbour = down.pop(0)
-        if neighbour > current_point_value and neighbour != 9:
-            down_basin.append(neighbour)
-
-    for _ in down:
-        neighbour = top.pop(0)
-        if neighbour > current_point_value and neighbour != 9:
-            top_basin.append(neighbour)
-
-    return [*down_basin, *top_basin]
+def dfs(grid, point: Tuple[int, int], length, width):
+    gradient = 0
+    value = grid[point]
+    grid[point] = -1
+    for row, column in find_nbrs(point, length, width):
+        if grid[(row, column)] == -1:
+            continue
+        if grid[(row, column)] > value and grid[(row, column)] != 9:
+            gradient += dfs(grid, (row, column), length, width) + 1
+    return gradient
 
 
 def convert_to_grid(data: List[List[int]]):
@@ -93,11 +76,18 @@ def convert_to_grid(data: List[List[int]]):
     return grid
 
 
-def part2(data: List[List[int]]):
-    """Solve part 2"""
+def part2(data):
+    length = len(data)
+    width = len(data[0])
+    basins = []
+    _, low_points = find_local_minima(data)
     grid = convert_to_grid(data)
-    print(grid)
-    find_vertical_gradient((2, 2), grid, len(data))
+    for row, column in low_points:
+        basins.append(dfs(grid, (row, column), length, width) + 1)
+    mult = 1
+    for basin in sorted(basins)[-3:]:
+        mult *= basin
+    return mult
 
 
 def solve(puzzle_input):
