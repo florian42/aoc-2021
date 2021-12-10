@@ -1,7 +1,8 @@
 import pathlib
 import statistics
 import sys
-from typing import List
+from typing import List, Deque
+from collections import deque
 
 
 def parse(puzzle_input):
@@ -42,23 +43,25 @@ def part1(data):
     return calculate_score(syntax_errors)
 
 
+def get_completion(line: Deque) -> (list[str], bool):
+    expected_closing = []
+    while len(line) > 0:
+        character = line.popleft()
+        if character in pairs.keys():
+            expected_closing.append(pairs[character])
+        elif expected_closing.pop() != character:
+            return expected_closing, True
+
+    return list(reversed(expected_closing)), False
+
+
 def get_completions(data):
-    all_lines = [list(line) for line in data]
+    all_lines = [deque(line) for line in data]
     completions = []
     for line in all_lines:
-        is_corrupted = False
-        expected_closing = []
-        while len(line) > 0:
-            character = line.pop(0)
-            if character in pairs.keys():
-                expected_closing.append(pairs[character])
-            else:
-                expected_closing_char = expected_closing.pop()
-                if expected_closing_char != character:
-                    is_corrupted = True
-                    break
+        completion, is_corrupted = get_completion(line)
         if not is_corrupted:
-            completions.append(list(reversed(expected_closing)))
+            completions.append(completion)
 
     return completions
 
