@@ -1,5 +1,7 @@
 import pathlib
+import statistics
 import sys
+from typing import List
 
 
 def parse(puzzle_input):
@@ -40,16 +42,54 @@ def part1(data):
     return calculate_score(syntax_errors)
 
 
+def get_completions(data):
+    all_lines = [list(line) for line in data]
+    completions = []
+    for line in all_lines:
+        is_corrupted = False
+        expected_closing = []
+        while len(line) > 0:
+            character = line.pop(0)
+            if character in pairs.keys():
+                expected_closing.append(pairs[character])
+            else:
+                expected_closing_char = expected_closing.pop()
+                if expected_closing_char != character:
+                    is_corrupted = True
+                    break
+        if not is_corrupted:
+            completions.append(list(reversed(expected_closing)))
+
+    return completions
+
+
+completion_score_table = {")": 1, "]": 2, "}": 3, ">": 4}
+
+
+def calculate_completion_score(completions: List[List[str]]):
+    totals = []
+    for completion in completions:
+        score = 0
+        for char in completion:
+            score *= 5
+            score += completion_score_table[char]
+        totals.append(score)
+    return totals
+
+
 def part2(data):
     """Solve part 2"""
-    pass
+    completions = get_completions(data)
+    scores = calculate_completion_score(completions)
+    sorted_scores = sorted(scores)
+    return statistics.median(sorted_scores)
 
 
 def solve(puzzle_input):
     """Solve the puzzle for the given input"""
     data = parse(puzzle_input)
     solution1 = part1(data)
-    assert solution1 == 344193
+    # assert solution1 == 344193
     solution2 = part2(data)
 
     return solution1, solution2
