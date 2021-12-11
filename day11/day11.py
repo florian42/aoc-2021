@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pathlib
 import sys
+from copy import deepcopy
 from typing import List, Dict, Tuple, Optional
 
 
@@ -76,32 +77,41 @@ def get_next_flashing_octo(dumbos: Dict[Tuple[int, int], DumboOctopus]):
 def part1(dumbos: Dict[Tuple[int, int], DumboOctopus], steps=100):
     """Solve part 1"""
     total_flash = 0
-    for _ in range(steps):
+    sync_flashing = -1
+    for step in range(steps):
+        step_flashes = 0
         for _, current in dumbos.items():
             current.step()
         next_flash = next(get_next_flashing_octo(dumbos), None)
         while next_flash:
             next_flash.flash()
             total_flash += 1
+            step_flashes += 1
             next_flash = next(get_next_flashing_octo(dumbos), None)
+        if step_flashes == len(dumbos.items()):
+            sync_flashing = step
         for _, current in dumbos.items():
             if current.flashed:
                 current.flashed = False
                 current.value = 0
 
-    return total_flash, dumbos
+    return total_flash, dumbos, sync_flashing
 
 
-def part2(data):
-    """Solve part 2"""
-    pass
+def part2(dumbos: Dict[Tuple[int, int], DumboOctopus]):
+    step = 1
+    sync_flashing = part1(dumbos, 1)
+    while sync_flashing[2] < 0:
+        sync_flashing = part1(dumbos, 1)
+        step += 1
+    return step
 
 
 def solve(puzzle_input):
     """Solve the puzzle for the given input"""
     data = parse(puzzle_input)
-    solution1, _ = part1(data)
-    solution2 = part2(data)
+    solution1, _, _ = part1(deepcopy(data))
+    solution2 = part2(deepcopy(data))
 
     return solution1, solution2
 
