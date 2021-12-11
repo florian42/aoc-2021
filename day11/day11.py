@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import pathlib
 import sys
+from typing import List
 
 
 def parse(puzzle_input):
@@ -10,6 +13,26 @@ def parse(puzzle_input):
 def part1(data):
     """Solve part 1"""
     pass
+
+
+class DumboOctopus:
+    def __init__(self, value, column, row, neighbours: List[DumboOctopus]):
+        self.value = value
+        self.column = column
+        self.row = row
+        self.neigbours = neighbours
+        self.flashed = False
+
+    def step(self):
+        self.value += 1
+        if self.value >= 9:
+            self.flash()
+
+    def flash(self):
+        if not self.flashed:
+            for neighbour in self.neigbours:
+                neighbour.step()
+            self.flashed = True
 
 
 def part2(data):
