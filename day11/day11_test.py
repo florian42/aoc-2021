@@ -1,62 +1,95 @@
-from day11.day11 import DumboOctopus
-from day2.day2_test import Builder
+import pathlib
+
+from day11.day11 import parse, part1
+
+
+def flatten(list_of_lists):
+    return [item for sublist in list_of_lists for item in sublist]
 
 
 class TestDumboOctopus:
-    def test_does_not_flash_when_already_flashed(self):
-        initial_value = 2
-        neighbours = [
-            DumboOctopus(initial_value, 0, 1, []),
-            DumboOctopus(initial_value, 1, 0, []),
-        ]
-        octopus = DumboOctopus(1, 0, 0, neighbours)
-        octopus.flashed = True
+    def test_step1(self):
+        puzzle_input = pathlib.Path("test_input").read_text().strip()
+        dumbos = parse(puzzle_input)
 
-        octopus.flash()
+        flashes, actual_dumbos = part1(dumbos, steps=1)
 
-        for neighbour in neighbours:
-            assert neighbour.value == initial_value
-            assert neighbour.flashed is False
+        result = [str(value.value) for key, value in actual_dumbos.items()]
 
-    def test_step_increases_value(self):
-        initial_value = 1
-        octopus = DumboOctopus(initial_value, 0, 0, [])
+        expected_result = """6594254334
+3856965822
+6375667284
+7252447257
+7468496589
+5278635756
+3287952832
+7993992245
+5957959665
+6394862637"""
 
-        octopus.step()
+        assert result == flatten([list(line) for line in expected_result.splitlines()])
 
-        assert octopus.value == initial_value + 1
+    def test_step2(self):
+        puzzle_input = pathlib.Path("test_input").read_text().strip()
+        dumbos = parse(puzzle_input)
 
-    def test_octopus_with_energy_level_gte_nine_flashes(self):
-        octopus = DumboOctopus(Builder.build_random_int(minimum=9), 0, 0, [])
+        flashes, actual_dumbos = part1(dumbos, steps=2)
 
-        octopus.step()
+        result = [str(value.value) for key, value in actual_dumbos.items()]
 
-        assert octopus.flashed is True
+        expected_result = """8807476555
+5089087054
+8597889608
+8485769600
+8700908800
+6600088989
+6800005943
+0000007456
+9000000876
+8700006848"""
 
-    def test_flashing_octopus_increases_energy_level_of_adjacent_octopuses(self):
-        initial_value = 2
-        neighbours = [
-            DumboOctopus(initial_value, 0, 1, []),
-            DumboOctopus(initial_value, 1, 0, []),
-        ]
-        octopus = DumboOctopus(9, 0, 0, neighbours)
+        assert result == flatten([list(line) for line in expected_result.splitlines()])
 
-        octopus.flash()
+    def test_step3(self):
+        puzzle_input = pathlib.Path("test_input").read_text().strip()
+        dumbos = parse(puzzle_input)
 
-        for neighbour in neighbours:
-            assert neighbour.value == initial_value + 1
-            assert neighbour.flashed is False
+        flashes, actual_dumbos = part1(dumbos, steps=3)
 
-    def test_when_octopus_flashes_neighbours_can_flash_too(self):
-        initial_value = 8
-        neighbours = [
-            DumboOctopus(initial_value, 0, 1, []),
-            DumboOctopus(initial_value, 1, 0, []),
-        ]
-        octopus = DumboOctopus(8, 0, 0, neighbours)
+        result = [str(value.value) for key, value in actual_dumbos.items()]
 
-        octopus.step()
+        expected_result = """0050900866
+8500800575
+9900000039
+9700000041
+9935080063
+7712300000
+7911250009
+2211130000
+0421125000
+0021119000"""
 
-        for neighbour in neighbours:
-            assert neighbour.value == initial_value + 1
-            assert neighbour.flashed is True
+        assert result == flatten([list(line) for line in expected_result.splitlines()])
+
+    def test_step10(self):
+        puzzle_input = pathlib.Path("test_input").read_text().strip()
+        dumbos = parse(puzzle_input)
+
+        flashes, actual_dumbos = part1(dumbos, steps=10)
+
+        result = [str(value.value) for key, value in actual_dumbos.items()]
+
+        expected_result = """0481112976
+0031112009
+0041112504
+0081111406
+0099111306
+0093511233
+0442361130
+5532252350
+0532250600
+0032240000"""
+
+        assert result == flatten([list(line) for line in expected_result.splitlines()])
+
+        assert flashes == 204
