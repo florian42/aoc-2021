@@ -41,21 +41,38 @@ def parse_input(puzzle_input):
 def part1(grid, folds):
     """Solve part 1"""
     fold = folds[0]
-    fold_axis = 1 if fold["coor"] == "x" else 0
-    back = grid[: fold.fixed[0], :].copy()
-    front = grid[fold.fixed[0] + 1 :, :].copy()
-    if fold_axis == 1:
-        folded: np.ndarray = back + np.fliplr(front)
+    if fold["coor"] == "x":
+        back = grid[:, : fold.fixed[0]].copy()
+        front = grid[:, fold.fixed[0] + 1 :].copy()
+        folded: np.ndarray = np.fliplr(front) + back
         return np.count_nonzero(folded)
-    if fold_axis == 0:
-        folded = back + np.flipud(front)
+    if fold["coor"] == "y":
+        back = grid[: fold.fixed[0], :].copy()
+        front = grid[fold.fixed[0] + 1 :, :].copy()
+        folded = np.flipud(front) + back
         return np.count_nonzero(folded)
     assert False
 
 
+def fold_grid(grid, fold):
+    if fold["coor"] == "x":
+        back = grid[:, : fold.fixed[0]].copy()
+        front = grid[:, fold.fixed[0] + 1 :].copy()
+        folded: np.ndarray = np.fliplr(front) + back
+        return folded
+    if fold["coor"] == "y":
+        back = grid[: fold.fixed[0], :].copy()
+        front = grid[fold.fixed[0] + 1 :, :].copy()
+        folded = np.flipud(front) + back
+        return folded
+
+
 def part2(grid, folds):
     """Solve part 2"""
-    pass
+    folded = grid.copy()
+    for fold in folds:
+        folded = fold_grid(folded, fold)
+    return "\n".join(map(lambda row: "".join(row), np.where(folded == 0, " ", "#")))
 
 
 def solve(puzzle_input):
