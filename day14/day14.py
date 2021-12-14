@@ -1,6 +1,7 @@
+import itertools
 import pathlib
 import sys
-from collections import defaultdict
+from collections import defaultdict, Counter
 from typing import Dict
 
 
@@ -15,29 +16,38 @@ def parse(puzzle_input):
     return polymer, pairs
 
 
-def insert_pair(polymer: str, pair: str, pairs: Dict[str, str]):
-    if pair in polymer:
-        index = polymer.index(pair)
-        start = polymer[: index + 1]
-        end = polymer[index + 1 :]
-        return start + pairs[pair] + end
+def step(polymer: str, pairs: Dict[str, str], steps=1):
+    pair_frequencies = Counter()
+    char_frequencies = Counter()
+    for pair in itertools.pairwise(polymer):
+        pair_frequencies[pair[0] + pair[1]] += 1
+    for _ in range(steps):
+        pair_frequencies_step = Counter()
+        for pair, frequency in pair_frequencies.items():
+            if pair in pairs:
+                pair_frequencies_step[pair[0] + pairs[pair]] += frequency
+                pair_frequencies_step[pairs[pair] + pair[1]] += frequency
+                char_frequencies[pairs[pair]] += frequency
+        pair_frequencies = pair_frequencies_step
+    ranking = char_frequencies.most_common()
+    return (ranking[0][1] - ranking[-1][1]) + 1
 
 
-def part1(data):
+def part1(polymer: str, pairs: Dict[str, str]):
     """Solve part 1"""
-    pass
+    return step(polymer, pairs, 10)
 
 
-def part2(data):
+def part2(polymer: str, pairs: Dict[str, str]):
     """Solve part 2"""
-    pass
+    return step(polymer, pairs, 40)
 
 
 def solve(puzzle_input):
     """Solve the puzzle for the given input"""
     data = parse(puzzle_input)
-    solution1 = part1(data)
-    solution2 = part2(data)
+    solution1 = part1(*data)
+    solution2 = part2(*data)
 
     return solution1, solution2
 
