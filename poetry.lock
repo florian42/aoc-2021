@@ -1330,7 +1330,7 @@ requests = ">=2.0,<3.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10"
-content-hash = "1ee0447e9213944c0b4df70d3b24808907543f583c3b6fb0aa52fc15ee90457a"
+content-hash = "4fa2e526c5b9309ff3c9b321073eb9a363e18ccf30c21465aba89f1c3c6fc042"
 
 [metadata.files]
 advent-of-code-data = [
