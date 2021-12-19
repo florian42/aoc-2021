@@ -49,7 +49,17 @@ def part1(grid):
 
 def part2(grid):
     """Solve part 2"""
-    pass
+    tile_width = len(grid)
+    tile_height = len(grid[0])
+    for _ in range(4):
+        for row in grid:
+            tail = row[-tile_width:]
+            row.extend((x + 1) if x < 9 else 1 for x in tail)
+    for _ in range(4):
+        for row in grid[-tile_height:]:
+            row = [(x + 1) if x < 9 else 1 for x in row]
+            grid.append(row)
+    return dijkstra(grid)
 
 
 def solve(puzzle_input):
