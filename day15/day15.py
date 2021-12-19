@@ -3,6 +3,8 @@ import pathlib
 import sys
 from collections import defaultdict
 from math import inf
+from colorama import init, Style, Fore
+from collections import deque
 
 
 def parse(puzzle_input):
@@ -24,6 +26,7 @@ def dijkstra(grid):
     to_visit = [(0, start)]  # usually contains all the vertices
     costs = defaultdict(lambda: inf, {start: 0})
     visited = set()
+    parents = {}
 
     while to_visit:
         cost, current_node = heapq.heappop(
@@ -37,9 +40,10 @@ def dijkstra(grid):
             if neighbor not in visited and new_cost < costs[neighbor]:
                 costs[neighbor] = new_cost
                 heapq.heappush(to_visit, (new_cost, neighbor))
+                parents[neighbor] = current_node
         visited.add(current_node)
 
-    return costs[destination]
+    return costs[destination], parents
 
 
 def part1(grid):
@@ -62,16 +66,44 @@ def part2(grid):
     return dijkstra(grid)
 
 
+def print_grid(grid, path):
+    width = len(grid)
+    height = len(grid[0])
+    for row_index in range(height):
+        row = ""
+        for column in range(width):
+            is_colored = (row_index, column) in path
+            if is_colored:
+                row += f"{Style.NORMAL}{grid[row_index][column]} {Style.DIM}"
+            else:
+                row += f"{Style.DIM}{grid[row_index][column]} "
+        print(row)
+        row = ""
+
+
+def get_shortest_path(parents, grid):
+    next = parents[(len(grid) - 1, len(grid[0]) - 1)]
+    path = deque([])
+    while next:
+        path.appendleft(next)
+        next = parents.get(next)
+    path.append((len(grid) - 1, len(grid[0]) - 1))
+    return list(path)
+
+
 def solve(puzzle_input):
     """Solve the puzzle for the given input"""
     grid = parse(puzzle_input)
-    solution1 = part1(grid)
-    solution2 = part2(grid)
+    solution1, parents = part1(grid)
+    solution2, parents = part2(grid)
+    shortest_path = get_shortest_path(parents, grid)
+    print_grid(grid, shortest_path)
 
     return solution1, solution2
 
 
 if __name__ == "__main__":
+    init()
     for path in sys.argv[1:]:
         print(f"{path}:")
         puzzle_input = pathlib.Path(path).read_text().strip()
