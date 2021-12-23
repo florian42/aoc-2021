@@ -1,7 +1,8 @@
 import pathlib
 import sys
+from math import prod
 
-from bitstream import Bitstream
+from day16.bitstream import Bitstream
 
 
 def binary_format(puzzle_input, length):
@@ -20,26 +21,54 @@ def sum_versions(packet):
 
 def parse(puzzle_input):
     """Parse input"""
-    return binary_format(puzzle_input.splitlines()[0], 24)
+    rawdata = bytes.fromhex(puzzle_input.splitlines()[0])
+    return "".join(map("{:08b}".format, rawdata))
 
 
 def part1(data):
     """Solve part 1"""
     stream = Bitstream(data)
     result = stream.decode_one_packet()
-    return sum_versions(result)
+    return sum_versions(result), result
 
 
-def part2(data):
+def evaluate_packet(packet):
+    _, type_id, data = packet
+
+    if type_id == 4:
+        return data
+
+    values = map(evaluate_packet, data)
+
+    match type_id:
+        case 0:
+            return sum(values)
+        case 1:
+            return prod(values)
+        case 2:
+            return min(values)
+        case 3:
+            return max(values)
+        case 5:
+            return int(values[0] > values[1])
+        case 6:
+            return int(values[0] < values[1])
+        case 7:
+            return int(values[0] == values[1])
+        case _:
+            raise Exception("Unknown typeId", type_id)
+
+
+def part2(result):
     """Solve part 2"""
-    pass
+    return evaluate_packet(result)
 
 
 def solve(puzzle_input):
     """Solve the puzzle for the given input"""
     data = parse(puzzle_input)
-    solution1 = part1(data)
-    solution2 = part2(data)
+    solution1, result = part1(data)
+    solution2 = part2(result)
 
     return solution1, solution2
 
