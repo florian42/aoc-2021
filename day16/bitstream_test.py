@@ -1,4 +1,4 @@
-from day16.Bitstream import Bitstream
+from day16.bitstream import Bitstream
 
 
 class TestBitstream:
