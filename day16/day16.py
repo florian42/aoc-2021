@@ -2,7 +2,7 @@ import pathlib
 import sys
 from math import prod
 
-from day16.bitstream import Bitstream
+from bitstream import Bitstream
 
 
 def binary_format(puzzle_input, length):
@@ -50,11 +50,14 @@ def evaluate_packet(packet):
         case 3:
             return max(values)
         case 5:
-            return int(values[0] > values[1])
+            a, b = values
+            return int(a > b)
         case 6:
-            return int(values[0] < values[1])
+            a, b = values
+            return int(a < b)
         case 7:
-            return int(values[0] == values[1])
+            a, b = values
+            return int(a == b)
         case _:
             raise Exception("Unknown typeId", type_id)
 
