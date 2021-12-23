@@ -1,10 +1,21 @@
 import pathlib
 import sys
 
+from bitstream import Bitstream
+
 
 def binary_format(puzzle_input, length):
     integer = int(puzzle_input, 16)
     return f"{integer:0>{length}b}"
+
+
+def sum_versions(packet):
+    version, type_id, data = packet
+
+    if type_id == 4:
+        return version
+
+    return version + sum(map(sum_versions, data))
 
 
 def parse(puzzle_input):
@@ -14,7 +25,9 @@ def parse(puzzle_input):
 
 def part1(data):
     """Solve part 1"""
-    pass
+    stream = Bitstream(data)
+    result = stream.decode_one_packet()
+    return sum_versions(result)
 
 
 def part2(data):
